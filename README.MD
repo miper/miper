@@ -10,19 +10,20 @@ Msful
 
 ```php
 
-define('SERVICE_ROOT', dirname(__DIR__).'/example/service/');
 
-$app = new Msful_App();
+$app = Msful_App::getAppInstance();
+
+require_once '/app/user/UserExport.php';
 
 $app->get('/user/#{uid}')
-  ->service('user::getUser')
+  ->call(['UserExport', 'getUser'])
   ->output()
   ->end()
   ;
 
 $app->get('/user/recommends')
-  ->service('user::getRecommendUserIds', 'userIds')
-  ->service('user::batchGetUsers', array(
+  ->call(['UserExport', 'getRecommendUserIds'], 'userIds')
+  ->call(['UserExport', 'batchGetUsers'], array(
       '@item' => array(
           'uid' => 'user_id',
           'flag' => '@unset'
@@ -31,7 +32,6 @@ $app->get('/user/recommends')
   ->output()
   ->end()
   ;
-
 
 ```
 

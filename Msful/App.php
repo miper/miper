@@ -22,7 +22,7 @@ class Msful_App
   private $start;
 
   private $pipeContinue = true;
-  private $routerPath;
+  private $hitDelegate = false;
 
   private $pipers = array();
 
@@ -81,7 +81,7 @@ class Msful_App
 
   function onAutoload($clsName, $params = null)
   {
-    $path = dirname(__DIR__).DIRECTORY_SEPARATOR. str_replace('_', DIRECTORY_SEPARATOR, $clsName).'.php';
+    $path = str_replace('_', DIRECTORY_SEPARATOR, $clsName).'.php';
     require_once $path;
   }
 
@@ -122,58 +122,36 @@ class Msful_App
   /**
    * 分配路由
    * @param  string $glob 路由的匹配规则
-   * @param  string $path 路由的文件路径
+   * @param  string $className 用来处理的代理类
    * @return Msful_App
    */
-  function delegate($glob, $path)
+  function delegate($glob, $className)
   {
-    if ($this->routerPath) {
+    if ($this->hitDelegate) {
       return $this;
     }
     
     $url = $this->request->url;
     $glob = rtrim($glob, '/');
     if (strpos($url, $glob) === 0) {
-      $this->routerPath = $path;
+      $this->hitDelegate = true;
 
-      if (!is_readable($path)) {
-        $this->triggerError('msful.notfound', 'fileNotFound path:'.$path);
-        return;
+      if (!class_exists($className)) {
+        throw new Exception('msful.notfound', 'delegete not found:'.$className);
       }
-
-      require_once $path;
+      $cls = new $className();
+      if ($cls instanceof Msful_Delegate_Interface) {
+        $cls->delegate($this);
+      }
     }
-    return $this;
   }
 
-  function get($url)
-  {
-    return $this->pipe('when', $url);
-  }
-
-  function post($url)
-  {
-    return $this->pipe('when', 'post '.$url);
-  }
-
-  function put($url)
-  {
-    return $this->pipe('when', 'put '.$url);
-  }
-
-  function delete($url)
-  {
-    return $this->pipe('when', 'delete '.$url);
-  }
-
-  function output()
-  {
-    return $this->pipe('output');
-  }
-
-  function service($url, $wrapper = null, $causes = null)
-  {
-    return $this->pipe('service', $url, $wrapper, $causes);
+  function __call($func, $args) {
+    if (in_array($func, Msful_Const::$methods)) {
+      return $this->pipe('request', array($func, $args[0]));
+    }
+    array_unshift($args, $func);
+    return call_user_func_array([$this, 'pipe'], $args);
   }
 
   /**

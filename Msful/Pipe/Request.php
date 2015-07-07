@@ -1,25 +1,27 @@
 <?php
 /**
- * When 管道
+ * 处理http请求的管道命令
+ * 
  * @authors ronnie (comdeng@live.com)
  * @date    2015-07-08 23:25:03
  * @version $Id$
  */
 
-class Msful_Pipe_When implements Msful_Pipe_Interface
+class Msful_Pipe_Request implements Msful_Pipe_Interface
 {
   function handle($app, $options)
   {
-    if (!is_string($options)) {
-      throw new Exception('msful_pipe_when.optionsIllegal');
-    }
-    $options = trim($options);
-    if ( ($pos = strpos($options, ' ')) !== false) {
-      $method = trim($options, 0, $pos);
-      $glob = trim($options, $pos + 1);
+    if (is_array($options)) {
+      list($method, $glob) = $options;
     } else {
-      $method = Msful_Const::METHOD_GET;
-      $glob = $options;
+      $options = trim($options);
+      if ( ($pos = strpos($options, ' ')) !== false) {
+        $method = trim($options, 0, $pos);
+        $glob = trim($options, $pos + 1);
+      } else {
+        $method = Msful_Const::METHOD_GET;
+        $glob = $options;
+      }
     }
     $method = strtolower($method);
 

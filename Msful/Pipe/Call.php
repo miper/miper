@@ -6,8 +6,9 @@
  * @version   1.0.0
  */
 
-class Msful_Pipe_Service implements Msful_Pipe_Interface
+class Msful_Pipe_Call implements Msful_Pipe_Interface
 {
+  private $classCache = array();
   /**
    * [pipe description]
    * @param  [type] $options [description]
@@ -18,15 +19,16 @@ class Msful_Pipe_Service implements Msful_Pipe_Interface
   {
     $_args = $app->request->args;
 
-    list($module, $func) = explode('::', $options);
-    $className = ucfirst($module).'Export';
-    $path = SERVICE_ROOT.'/'.$module.'/'.$className.'.php';
-    require_once $path;
+    list($className, $func) = $options;
 
     if (!class_exists($className)) {
       throw new \Exception('msful_pipe_service.moduleNotFound class:'.$className);
     }
-    $cls = new $className();
+    if (!isset($this->classCache[$className])) {
+      $cls = $this->classCache[$className] = new $className();
+    } else {
+      $cls = $this->classCache[$className];
+    }
     if (!method_exists($cls, $func)) {
       throw new \Exception('msful_pipe_service.methodNotFound method:'.$className.'::'.$func);
     }
