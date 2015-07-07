@@ -17,6 +17,5 @@ $app->post('/demo', function() {
   return 'post /demo';
 });
 
-$app->start();
 
 ```
