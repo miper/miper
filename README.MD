@@ -10,14 +10,27 @@ Msful
 
 ```php
 
-$app = new Msful_App();
-$app->get('/demo', function() {
-  return 'get /demo';
-});
+define('SERVICE_ROOT', dirname(__DIR__).'/example/service/');
 
-$app->post('/demo', function() {
-  return 'post /demo';
-});
+$app = new Msful_App();
+
+$app->get('/user/#{uid}')
+  ->service('user::getUser')
+  ->output()
+  ->end()
+  ;
+
+$app->get('/user/recommends')
+  ->service('user::getRecommendUserIds', 'userIds')
+  ->service('user::batchGetUsers', array(
+      '@item' => array(
+          'uid' => 'user_id',
+          'flag' => '@unset'
+        )
+    ))
+  ->output()
+  ->end()
+  ;
 
 
 ```
@@ -43,3 +56,14 @@ server {
 }
 
 ```
+
+### TODO
+
+* 文档生成功能
+* 数据库ORM/基础功能自动化
+* 自动化校验
+* 接口数据拼装
+* 数据流式及简单逻辑处理
+* 自动化测试
+
+** markdown/jade/less支持

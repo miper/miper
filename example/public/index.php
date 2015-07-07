@@ -2,22 +2,17 @@
 
 $root = dirname(dirname(__DIR__));
 
-require $root.'/src/Msful/App.php';
+require $root.'/Msful/App.php';
 
-define('ROUTER_ROOT', dirname(__DIR__).'/service/');
+define('SERVICE_ROOT', dirname(__DIR__).'/example/service/');
 
-$app = new Msful_App();
+$app = Msful_App::getAppInstance();
+$app->delegate('/user/', SERVICE_ROOT.'/user/pipe.conf.php');
 
-// $app->get('/test', function() {
-//   return 'test';
-// });
-$app->dispatch('/demo/', 'demo');
-$app->dispatch('/user/', 'user');
-$app->dispatch('/user/test/', 'user');
-
-$app->error('msful.notfound', function() {
+$app->error('msful.notfound', function($msg, $detail) use($app) {
   header('HTTP/1.1 404 Not Found');
   return array(
-    'err' => 'notfound',
+    'msg'     => $msg,
+    'detail'  => $detail,
   );
 });
