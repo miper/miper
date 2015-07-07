@@ -25,6 +25,15 @@ class Msful_App
   {
     $this->request = new Msful_Request();
     $this->request->init($_GET, $_POST, $_SERVER);
+
+    register_shutdown_function(array($this, 'onShutdown'));
+  }
+
+  function onShutdown()
+  {
+    if (!$this->hitRoute) {
+      $this->triggerError('msful.notfound');
+    }
   }
 
   // private $dispatchers = array();
@@ -51,6 +60,17 @@ class Msful_App
       $glob = rtrim($glob, '/');
       if (strpos($url, $glob) === 0) {
         $this->routeName = $routeName;
+
+        if (!defined('ROUTER_ROOT')) {
+          return $this->triggerError('msful.notfound');
+        }
+        $rpath = ROUTER_ROOT.'/'.$this->routeName.'/index.php';
+
+        if (!is_readable($rpath)) {
+          return $this->triggerError('msful.notfound');
+        }
+    
+        include $rpath;
       }
     }
   }
@@ -133,28 +153,6 @@ class Msful_App
     exit();
   }
 
-  function start()
-  {
-
-    if (!$this->routeName) {
-      return $this->triggerError('msful.notfound');
-    }
-
-    if (!defined('ROUTER_ROOT')) {
-      return $this->triggerError('msful.notfound');
-    }
-    $rpath = ROUTER_ROOT.'/'.$this->routeName.'/index.php';
-
-    if (!is_readable($rpath)) {
-      return $this->triggerError('msful.notfound');
-    }
-  
-    include $rpath;
-
-    if (!$this->hitRoute) {
-      return $this->triggerError('msful.notfound');
-    }
-  }
 
   function error($code, $callback)
   {

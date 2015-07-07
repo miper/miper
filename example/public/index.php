@@ -7,6 +7,10 @@ require $root.'/src/Msful/App.php';
 define('ROUTER_ROOT', dirname(__DIR__).'/service/');
 
 $app = new Msful_App();
+
+// $app->get('/test', function() {
+//   return 'test';
+// });
 $app->dispatch('/demo/', 'demo');
 $app->dispatch('/user/', 'user');
 $app->dispatch('/user/test/', 'user');
@@ -17,5 +21,3 @@ $app->error('msful.notfound', function() {
     'err' => 'notfound',
   );
 });
-
-$app->start();
