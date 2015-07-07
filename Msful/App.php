@@ -15,14 +15,16 @@ class Msful_App
   private static $app;
 
   /** @var array 中转数据 */
-  private $datas = array();
+  var $datas;
 
-  private $code = 200;
+  var $code;
 
-  var $args = array();
+  private $start;
 
-  private $pipeContinue = false;
+  private $pipeContinue = true;
   private $routerPath;
+
+  private $pipers = array();
 
   private function __construct()
   {
@@ -35,7 +37,13 @@ class Msful_App
     $this->request = new Msful_Request();
     $gets = $_GET;
     $posts = $_POST;
-    $servers = $_SERVER;
+    $servers = array();
+
+    foreach($_SERVER as $key => $value) {
+      if (preg_match('#^(SERVER|HTTP|REQUEST|REMOTE)\_#', $key)) {
+        $servers[$key] = $value;
+      }
+    }
 
     $this->request->init($gets, $posts, $servers);
 
@@ -47,6 +55,9 @@ class Msful_App
     if ($this->request->debug) {
       ini_set('display.errors', true);
     }
+
+      
+    $this->code = Msful_Const::HTTP_CODE_NOT_FOUND;
   }
 
   /**
@@ -63,7 +74,7 @@ class Msful_App
 
   function onShutdown()
   {
-    if (!$this->pipeContinue) {
+    if (!$this->code != Msful_Const::HTTP_CODE_OK) {
       $this->triggerError('msful.notfound');
     }
   }
@@ -81,38 +92,43 @@ class Msful_App
 
   function onError()
   {
-    restore_error_handler();
     echo '<pre>';
     print_r(func_get_args());
     echo '</pre>';
     return true;
   }
 
-  private function triggerError($code)
+  private function triggerError($msg, $detail = null)
   {
-    if (isset($this->errors[$code])) {
-      $callback = $this->errors[$code];
+    if (isset($this->errors[$msg])) {
+      $callback = $this->errors[$msg];
       if (!is_callable($callback)) {
         throw new Exception('msful.errorCallbackNotCallable code:'.$code);
       }
 
-      $ret = call_user_func($callback);
-      $this->output($ret);
+      $ret = call_user_func($callback, $msg, $detail);
+      $this->datas = $ret;
+      $this->pipeContinue = true;
+      $this->pipe('output', true);
     }
+  }
+
+  
+  function error($code, $callback)
+  {
+    $this->errors[$code] = $callback;
   }
 
   /**
    * 分配路由
    * @param  string $glob 路由的匹配规则
    * @param  string $path 路由的文件路径
-   * @param string $clsName 类名
-   * @param array $paramname 初始化参数
    * @return Msful_App
    */
-  function delegate($glob, $path, $clsName = null, $confs = null)
+  function delegate($glob, $path)
   {
     if ($this->routerPath) {
-      return;
+      return $this;
     }
     
     $url = $this->request->url;
@@ -121,194 +137,101 @@ class Msful_App
       $this->routerPath = $path;
 
       if (!is_readable($path)) {
-        $this->triggerError('msful.notfound');
+        $this->triggerError('msful.notfound', 'fileNotFound path:'.$path);
         return;
       }
 
       require_once $path;
     }
-  }
-
-  /**
-   * 条件
-   * @param string $method 请求方法
-   * @param string $glob   请求路径
-   * @param callable $closure 闭包
-   * @return
-   */
-  function when($method, $glob)
-  {
-    if ($this->pipeContinue) {
-      return $this;
-    }
-    if ($method != $this->request->method) {
-      return $this;
-    }
-
-    $args = $this->handleGlob($glob, $this->request->url);
-    if ($args === false) {
-      return $this;
-    }
-    if (is_array($args)) {
-      $this->args = $args;
-    }
-    $this->pipeContinue = true;
-    
     return $this;
   }
 
-  private function handleGlob($glob, $url)
+  function get($url)
   {
-    $glob = rtrim($glob, '/');
-    $pos = strpos($glob, '#{');
-    if ($pos === false) {
-      return $glob == $url;
-    }
-
-    $expEnabled = false;
-    $args = array();
-
-    while(true) {
-      $pos += 2;
-      $pos2 = strpos($glob, '}', $pos);
-      $adorn = '';
-
-      if ($pos2 === false) {
-        break;
-      }
-
-      $tag = substr($glob, $pos, $pos2 - $pos);
-      
-      if ($tag && ($pos3 = strpos($tag, ':')) !== false) {
-        $type = strpos($tag, $pos3 + 1);
-        $tag = strpos($tag, 0, $pos3);
-      } else {
-        $type = 'int';
-      }
-
-      switch($type) {
-        case 'chinese':
-          $exp = '[x{4e00}-x{9fa5}]+';
-          $adorn = 'u';
-          break;
-        case 'int':
-          $exp = '[0-9]+';
-          break;
-        case 'hex':
-          $exp = '[0-9a-z]+';
-          break;
-        default:
-          $exp = '[0-9a-zA-Z\-\_\.]+';
-          break;
-      }
-
-      $glob = substr($glob, 0, $pos - 2).'('. $exp.')'.substr($glob, $pos2 + 1);
-      $args[$tag] = null;
-      $expEnabled = true;
-
-      $pos = strpos($glob, '#{');
-      if ($pos === false) {
-        break;
-      }
-    }
-
-    if (!$expEnabled) {
-      return $glob == $url;
-    }
-
-    $glob = '#^'.$glob.'#'.$adorn;
-    if (preg_match($glob, $url, $ms)) {
-      $num = 1;
-      foreach($args as $key => $value) {
-        if (array_key_exists($num, $ms)) {
-          $args[$key] = $ms[$num];
-        }
-        $num++;
-      }
-    } else {
-      return false;
-    }
-    return $args;
+    return $this->pipe('when', $url);
   }
 
-  private $lastDatas = array();
+  function post($url)
+  {
+    return $this->pipe('when', 'post '.$url);
+  }
+
+  function put($url)
+  {
+    return $this->pipe('when', 'put '.$url);
+  }
+
+  function delete($url)
+  {
+    return $this->pipe('when', 'delete '.$url);
+  }
+
+  function output()
+  {
+    return $this->pipe('output');
+  }
+
+  function service($url, $wrapper = null, $causes = null)
+  {
+    return $this->pipe('service', $url, $wrapper, $causes);
+  }
+
   /**
    * 管道执行
    * @param  [type] $executor [description]
    * @param  [type] $options  [description]
-   * @param  array  $causes   [description]
-   * @param  array  $wrapper  [description]
+   * @param  mixed  $wrapper  [description]
+   * @param  mixed  $causes   [description]
    * @return [type]           [description]
    */
-  function pipe($executor, $options, $causes = array(), $wrapper = array())
+  function pipe($executor, $options = null, $wrapper = null, $causes = null)
   {
     if (!$this->pipeContinue) {
       return $this;
     }
 
-    $className = 'Msful_Pipe_'.ucfirst($executor);
-
-    $datas = $this->lastDatas;
+    // 判断是否允许进行该条件
+    if ($causes === false) {
+      return $this;
+    }
     
-    $cls = new $className();
-    $continue = $cls->pipe($this, $options, $causes, $wrapper, $datas);
-    $this->lastDatas = $datas;
+    if ($causes !== null && is_callable($causes)) {
+      $causeRet = call_user_func($causes);
+      if ($causeRet === false) {
+        return $this;
+      }
+    }
+
+    if (!isset($this->pipers[$executor])) {
+      $className = 'Msful_Pipe_'.ucfirst($executor);
+      $cls = $this->pipers[$executor] = new $className();
+    } else {
+      $cls = $this->pipers[$executor];
+    }
+
+    $continue = $cls->handle($this, $options);
 
     if ($continue === false) {
       $this->pipeContinue = false;
-    } else {
-      $this->datas[$executor][] = $datas;
     }
+
+    // 对数据进行封装处理
+    if ($this->datas !== null) {
+      if (is_string($wrapper)) {
+        $this->datas = array($wrapper => $this->datas);
+      } else if (is_callable($wrapper)) {
+        $this->datas = call_user_func($wrapper, $this->datas);
+      }
+    }
+
     return $this;
   }
 
-  function output()
+  /**
+   * @return 结束
+   */
+  function end()
   {
-    $format = $this->request->format; 
-    $options = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
-    $ret = $this->datas;
-    switch($format) {
-      case Msful_Const::FORMAT_JSON:
-        header('Content-type: application/json; charset=UTF-8');
-        echo json_encode(array(
-          'code' => 200,
-          'data' => $ret,
-        ), $options);
-        break;
-      case Msful_Const::FORMAT_HTML:
-        header('Content-type: text/html; charset=UTF-8');
-        if (is_scalar($ret)) {
-          echo $ret;
-        } else {
-          echo '<pre>';
-          print_r($ret);
-          echo '</pre>';
-        }
-        break;
-      case Msful_Const::FORMAT_TEXT:
-        header('Content-type: text/plain; charset=UTF-8');
-        if (is_scalar($ret)) {
-          echo $ret;
-        } else {
-          print_r($ret);
-        }
-        break;
-      case Msful_Const::FORMAT_JAVASCRIPT:
-        header('Content-type: application/x-javascript; charset=UTF-8');
-        if ( ($callback = $this->request->get('callback')) ) {
-          echo sprintf('%s(%s);', $callback, json_encode(array(
-            'code' => 200,
-            'data' => $ret,
-            ), $options));
-        } else {
-          if (!is_scalar($ret)) {
-            echo json_encode($ret, $options);
-          } else {
-            echo $ret;
-          }
-        }
-        break;
-    }
-    exit();
+      $this->pipeContinue = true;
   }
 }

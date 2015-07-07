@@ -38,6 +38,43 @@ class UserExport
   }
 
   /**
+   * 获取指定的城市的推荐用户
+   * @param  int $cityId 城市ID
+   * @param  [int=20] $num 数量
+   * @return array
+   * -array
+   *  -int $uid 用户id
+   */
+  function getRecommendUserIds($cityId, $num = 20)
+  {
+    return array(
+      rand(30, 44),
+      rand(334,343),
+      rand(223, 243),
+      rand(1932, 2234),
+      );
+  }
+
+  /**
+   * 批量获取用户
+   * @param  [type]
+   * @return [type]
+   */
+  function batchGetUsers($userIds)
+  {
+    $ret = array();
+    foreach($userIds as $uid) {
+      $ret[] = array(
+        'uid' => $uid,
+        'uname' => 'uname'.rand(10000, 99999),
+        'sex' => rand(1, 2),
+        'flag' => rand(1,4),
+      );
+    }
+    return $ret;
+  }
+
+  /**
    * 删除用户
    * @param  int $uid 用户ID
    */

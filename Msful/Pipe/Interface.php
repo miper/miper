@@ -10,11 +10,9 @@ interface Msful_Pipe_Interface
 {
   /**
    * 管道接口
+   * @param  Msful_App  $app      APP
    * @param  mixed      $options  选项
-   * @param  closure    $cause    条件
-   * @param  closure    $wrapper  封装器
-   * @param  mixed      $datas   输入数据
    * @return boolean 返回false，表示后续终端执行
    */
-  function pipe($app, $options, $cause, $wrapper, &$datas);
+  function handle($app, $options);
 }

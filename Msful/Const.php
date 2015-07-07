@@ -35,4 +35,18 @@ class Msful_Const
   const TERMINAL_PC = 'pc';
   const TERMINAL_WAP = 'wap';
   const TERMINAL_APP = 'app';
+
+  const HTTP_CODE_OK = 200;
+  const HTTP_CODE_NOT_FOUND = 404;
+  const HTTP_CODE_FORBIDDEN = 403;
+  const HTTP_CODE_UNAUTHORIZED = 401;
+  const HTTP_CODE_SERVICE_UNAVAILABLE = 503;
+
+  static $httpCodes = array(
+    self::HTTP_CODE_OK => 'ok',
+    self::HTTP_CODE_UNAUTHORIZED => 'Unauthried',
+    self::HTTP_CODE_FORBIDDEN => 'Forbidden',
+    self::HTTP_CODE_NOT_FOUND => 'Not Found',
+    self::HTTP_CODE_SERVICE_UNAVAILABLE => 'Service Unavailable',
+    );
 }
