@@ -1,0 +1,12 @@
+{
+    "name": "hapn/msful",
+    "description": "Micro Service Restful Framework",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ronnie",
+            "email": "comdeng@live.com"
+        }
+    ],
+    "require": {}
+}
