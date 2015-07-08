@@ -17,6 +17,7 @@ class Msful_Request
 
   var $method;
   var $url;
+  var $format = 'json';
 
   /**
    * 初始化请求
@@ -29,8 +30,23 @@ class Msful_Request
   {
     // 获取请求网址
     $uri = $servers['REQUEST_URI'];
-    $path = parse_url($uri, PHP_URL_PATH);
-    $this->url = rtrim($path, '/');
+    $uriInfo = parse_url($uri);
+    if (!$uriInfo) {
+      throw new Exception('msful.uriParseFailed uri:'. $uri);
+    }
+
+    // 根据网址后缀来决定使用哪种格式返回
+    $url = $uriInfo['path'];
+    $pathInfo = pathinfo($url);
+    $ext = MSful_Const::FORMAT_JSON;
+    if (isset($pathInfo['extension'])) {
+      $ext = strtolower($pathInfo['extension']);
+      if (!in_array($ext, MSful_Const::$formats)) {
+        $ext = MSful_Const::FORMAT_JSON;
+      }
+    }
+    $this->format = $ext;
+    $this->url = rtrim(rtrim($pathInfo['dirname'], '/').'/'.$pathInfo['filename'], '/');
 
     // 初始化请求方法
     $method = strtolower($servers['REQUEST_METHOD']);
@@ -50,14 +66,19 @@ class Msful_Request
   }
 
   /**
-   * 获取指定的get变量
+   * 如果是get请求，从gets获取指定的变量，如果为非get请求，则优先从posts里边取，没有则从gets里边取
    * @param  string $key    key
    * @param  mixed $defVal 默认值
    * @return mixed
    */
   function get($key, $defVal = null)
   {
-    if (array_key_exists($this->gets, $key)) {
+    if ($this->method != 'get') {
+      if (array_key_exists($key, $this->posts)) {
+        return $this->posts[$key];
+      }
+    }
+    if (array_key_exists($key, $this->gets)) {
       return $this->gets[$key];
     }
     return $defVal;

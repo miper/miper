@@ -19,4 +19,16 @@ class Msful_Const
     self::METHOD_PUT,
     self::METHOD_DELETE,
   );
+
+  const FORMAT_JSON = 'json';
+  const FORMAT_HTML = 'html';
+  const FORMAT_TEXT = 'text';
+  const FORMAT_JAVASCRIPT = 'js';
+
+  static $formats = array(
+    self::FORMAT_JSON,
+    self::FORMAT_TEXT,
+    self::FORMAT_JAVASCRIPT,
+    self::FORMAT_TEXT,
+  );
 }
