@@ -14,6 +14,9 @@ function test($fooId)
 }
 
 $app->get('/test/#{fooId}', 'test');
+$app->delegate('/docs/', $root.'/src/Msful_Docs/Service.php', 'Msful_Docs_Service', array(
+  'glob' => ROUTER_ROOT.'**/*Export.php',
+  ));
 
 // $app->get('/test', function() {
 //   return 'test';
@@ -24,7 +27,7 @@ $app->get('/test/#{fooId}', 'test');
 $app->get('/hello', function() {
   return 'hello';
 });
-$app->delegate('/user/', ROUTER_ROOT.'/user/UserExport.php', 'MyMsful_Service_User');
+$app->delegate('/user/', ROUTER_ROOT.'user/routers.php');
 
 $app->error('msful.notfound', function() {
   return array(

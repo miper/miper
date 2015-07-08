@@ -46,7 +46,9 @@ class Msful_App
   function onError()
   {
     restore_error_handler();
-    var_dump(func_get_args());
+    echo '<pre>';
+    print_r(func_get_args());
+    echo '</pre>';
     return true;
   }
 
@@ -58,9 +60,10 @@ class Msful_App
    * @param  string $glob 路由的匹配规则
    * @param  string $path 路由的文件路径
    * @param string $clsName 类名
+   * @param array $paramname 初始化参数
    * @return Msful_App
    */
-  function delegate($glob, $path, $clsName = null)
+  function delegate($glob, $path, $clsName = null, $confs = null)
   {
     if ($this->routerPath) {
       return;
@@ -76,31 +79,52 @@ class Msful_App
         return;
       }
 
+      $doRoute = false;
+
+      $routers = false;
+
       if ($clsName === null) {
-        require $path;
-        return;
+        // 如果文件返回的是数组，表明是定义了一组路由项
+        
+        $configs = include($path);
+        if (empty($configs) || !is_array($configs)) {
+          return;
+        } 
+        $path = $configs['path'];
+        $clsName = $configs['class'];
+        $routers = $configs['routers'];
+
+        $doRoute = true;
       }
 
       require_once $path;
-
       if (!class_exists($clsName)) {
         return $this->triggerError('msful.notfound', 'class:'.$clsName);
       }
 
       // 加载类，如果实现了接口，则调用接口里边定义的_router方法，获取router的相关配置
-      $cls = new $clsName();
-      if ($cls instanceof Msful_Router_Interface) {
+      if ($confs === null) {
+        $cls = new $clsName();
+      } else {
+        $cls = new $clsName($confs);
+      }
+      
+      if ($routers === false && $cls instanceof Msful_Router_Interface) {
         $routers = $cls->_routers();
-        foreach($routers as $clsMethod => $router) {
-          $router = trim($router);
-          list($method, $glob) = explode(' ', $router);
-          if (strpos($method, '|') !== false) {
-            $method = explode('|', $method);
-          }
-          $this->route($method, $glob, array($cls, $clsMethod));
-          if ($this->hitRoute) {
-            break;
-          }
+      }
+      if (!$routers) {
+        return;
+      }
+
+      foreach($routers as $clsMethod => $router) {
+        $router = trim($router);
+        list($method, $glob) = explode(' ', $router);
+        if (strpos($method, '|') !== false) {
+          $method = explode('|', $method);
+        }
+        $this->route($method, $glob, array($cls, $clsMethod));
+        if ($this->hitRoute) {
+          break;
         }
       }
 
@@ -218,20 +242,32 @@ class Msful_App
   private function output($ret)
   {
     $format = $this->request->format; 
+    $options = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
     switch($format) {
       case Msful_Const::FORMAT_JSON:
         header('Content-type: application/json; charset=UTF-8');
         echo json_encode(array(
           'code' => 200,
           'data' => $ret,
-        ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        ), $options);
         break;
       case Msful_Const::FORMAT_HTML:
         header('Content-type: text/html; charset=UTF-8');
-        echo $ret;
-      case Msful_Const::FORMT_TEXT:
+        if (is_scalar($ret)) {
+          echo $ret;
+        } else {
+          echo '<pre>';
+          print_r($ret);
+          echo '</pre>';
+        }
+        break;
+      case Msful_Const::FORMAT_TEXT:
         header('Content-type: text/plain; charset=UTF-8');
-        echo $ret;
+        if (is_scalar($ret)) {
+          echo $ret;
+        } else {
+          print_r($ret);
+        }
         break;
       case Msful_Const::FORMAT_JAVASCRIPT:
         header('Content-type: application/x-javascript; charset=UTF-8');
@@ -239,9 +275,13 @@ class Msful_App
           echo sprintf('%s(%s);', $callback, json_encode(array(
             'code' => 200,
             'data' => $ret,
-            ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            ), $options));
         } else {
-          echo $ret;
+          if (!is_scalar($ret)) {
+            echo json_encode($ret, $options);
+          } else {
+            echo $ret;
+          }
         }
         break;
     }

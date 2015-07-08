@@ -29,6 +29,6 @@ class Msful_Const
     self::FORMAT_JSON,
     self::FORMAT_TEXT,
     self::FORMAT_JAVASCRIPT,
-    self::FORMAT_TEXT,
+    self::FORMAT_HTML,
   );
 }

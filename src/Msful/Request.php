@@ -38,11 +38,11 @@ class Msful_Request
     // 根据网址后缀来决定使用哪种格式返回
     $url = $uriInfo['path'];
     $pathInfo = pathinfo($url);
-    $ext = MSful_Const::FORMAT_JSON;
+    $ext = Msful_Const::FORMAT_JSON;
     if (isset($pathInfo['extension'])) {
       $ext = strtolower($pathInfo['extension']);
-      if (!in_array($ext, MSful_Const::$formats)) {
-        $ext = MSful_Const::FORMAT_JSON;
+      if (!in_array($ext, Msful_Const::$formats)) {
+        $ext = Msful_Const::FORMAT_JSON;
       }
     }
     $this->format = $ext;
@@ -58,11 +58,15 @@ class Msful_Request
       } else if (isset($servers['X_HTTP_METHOD_OVERRIDE'])) {
         $_method = strtolower($servers['X_HTTP_METHOD_OVERRIDE']);
       }
-      if ($_method && $_method != $method && in_array($method, MSful_Const::$methods)) {
+      if ($_method && $_method != $method && in_array($method, Msful_Const::$methods)) {
         $method = $_method;
       }
     }
     $this->method = $method;
+
+    $this->gets = $gets;
+    $this->posts = $posts;
+    $this->servers = $servers;
   }
 
   /**
@@ -92,7 +96,7 @@ class Msful_Request
    */
   function post($key, $defVal = null)
   {
-    return $this->_getPostVal(MSful_Const::METHOD_POST, $key, $defVal);
+    return $this->_getPostVal(Msful_Const::METHOD_POST, $key, $defVal);
   }
 
   /**
@@ -103,7 +107,7 @@ class Msful_Request
    */
   function put($key, $defVal = null)
   {
-    return $this->_getPostVal(MSful_Const::METHOD_PUT, $key, $defVal);
+    return $this->_getPostVal(Msful_Const::METHOD_PUT, $key, $defVal);
   }
 
   /**
@@ -114,7 +118,7 @@ class Msful_Request
    */
   function delete($key, $defVal = null)
   {
-    return $this->_getPostVal(MSful_Const::METHOD_DELETE, $key, $defVal);
+    return $this->_getPostVal(Msful_Const::METHOD_DELETE, $key, $defVal);
   }
 
   function _getPostVal($method, $key, $defVal = null)
