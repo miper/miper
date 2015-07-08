@@ -21,21 +21,39 @@ define('SERVICE_ROOT', dirname(__DIR__).'/example/service/');
 
 $app = new Msful_App();
 
-$app->get('/user/#{uid}')
+$app
+  // get请求，网址匹配/user/#{uid}时进行后续处理，如访问/user/40
+  // 等于 ->pipe('when', 'get /user/#{uid}')
+  ->get('/user/#{uid}')  
+  // 将请求映射到user模块的getUser方法
+  // 等于 ->pipe('service', 'user::getUser')
   ->service('user::getUser')
+  // 输出结果
+  // 等于 ->pipe('output')
   ->output()
+  // 结束该流程
   ->end()
   ;
 
-$app->get('/user/recommends')
+$app
+  // get请求，匹配/user/recommens网址
+  ->get('/user/recommends')
+  // 将请求先映射到user模块的getRecommendUserIds，
+  // 并将返回的用户ID数组封装成array('userIds' => array(2,3,22))的形式，供下一个接口使用
   ->service('user::getRecommendUserIds', 'userIds')
-  ->service('user::batchGetUsers', array(
+  // 将前一个接口获取的数据作为参数传递给user模块的batchGetUsers函数
+  ->service('user::batchGetUsers', 
+    // TODO 用数组模板来约束输出数据的格式
+    array(
       '@item' => array(
           'uid' => 'user_id',
           'flag' => '@unset'
         )
-    ))
+    )
+  )
+  // 输出结果
   ->output()
+  // 结束此流程
   ->end()
   ;
 
