@@ -4,7 +4,14 @@ Msful
 
 ## Micro Service Restful Framework
 
-微服务专用PHP框架
+微服务专用PHP框架。
+
+## Msful的核心思想
+
+1. 提供Restful风格的接口
+2. 基于流水线的处理流程
+3. 将接口作为基础组件自由拼装
+4. 实时生成和浏览接口文档
 
 ### 使用demo
 
