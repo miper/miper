@@ -1,9 +1,9 @@
 <?php
 /**
- * http请求
- * @author ronnie<comdeng@live.com>
- * @since    2015-07-07 16:29:48
- * @version 1.0.0
+ * 请求类
+ * @author    ronnie<comdeng@live.com>
+ * @since     2015-07-08 19:36:12
+ * @version   1.0.0
  */
 
 require_once __DIR__.'/Const.php';
@@ -19,6 +19,7 @@ class Msful_Request
   var $url;
   var $format = 'json';
   var $debug = false;
+  var $terminal;
 
   /**
    * 初始化请求

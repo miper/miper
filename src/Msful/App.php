@@ -26,6 +26,11 @@ class Msful_App
     $this->request = new Msful_Request();
     $this->request->init($_GET, $_POST, $_SERVER);
 
+    error_reporting(E_ALL);
+    if ($this->request->debug) {
+      ini_set('display.errors', true);
+    }
+
     register_shutdown_function(array($this, 'onShutdown'));
     set_exception_handler(array($this, 'onException'));
     set_error_handler(array($this, 'onError'));

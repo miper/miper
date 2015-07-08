@@ -2,6 +2,9 @@
 
 /**
  * 用户类
+ * test
+ * @author  ronnie<dengxiaolong@hunbasha.com>
+ * @since  2015/7/8 16:49:23
  * @param string $avatar 头像地址
  * @param enum[int] $status 状态 vars(-1:删除, -2:禁用, 1:正常)
  * @param string $uname 用户名
@@ -30,6 +33,7 @@ class UserExport
       'uid' => $uid,
       'uname' => 'ronnie',
       'sex' => 1,
+      'flag' => 3,
     );
   }
 
