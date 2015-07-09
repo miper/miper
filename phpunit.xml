@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit 
+    bootstrap="Miper/Autoload.php" 
+    colors="true"
+    verbose="true"
+    >
+    <testsuites>
+        <!-- <testsuite name="docs">
+            <directory suffix=".php">tests/Miper/Test/Docs/</directory>
+        </testsuite> -->
+
+        <testsuite name="view">
+            <directory suffix=".php">tests/Miper/Test/View/</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            
+        </whitelist>
+    </filter>
+
+    <php>
+        <ini name="date.timezone" value="UTC"/>
+    </php>
+
+    
+</phpunit>

@@ -1,2 +1,4 @@
 \.\_*
 public
+composer.lock
+vendor
