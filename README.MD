@@ -17,7 +17,7 @@ Restful风格、基于管道(Pipe)技术、使用PHP语言的微服务专有框�
 
 ### 入门
 
-使用`Piper`很容易上手，下面是简单的请求例子，直接使用pipe组件。
+使用`Miper`很容易上手，下面的例子构建了一个简单的接口。
 
 ```php
 $app = Miper_App::getAppInstance();
