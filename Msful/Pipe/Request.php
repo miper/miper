@@ -11,8 +11,12 @@ class Msful_Pipe_Request implements Msful_Pipe_Interface
 {
   function handle($app, $options)
   {
+    $closure = null;
     if (is_array($options)) {
       list($method, $glob) = $options;
+      if (count($options) > 2) {
+        $closure = $options[2];
+      }
     } else {
       $options = trim($options);
       if ( ($pos = strpos($options, ' ')) !== false) {
@@ -39,6 +43,9 @@ class Msful_Pipe_Request implements Msful_Pipe_Interface
 
     $app->code = Msful_Const::HTTP_CODE_OK;
 
+    if ($closure && is_callable($closure)) {
+      $app->datas = call_user_func($closure, $app->request);
+    }
     return true;
   }
 
@@ -73,29 +80,36 @@ class Msful_Pipe_Request implements Msful_Pipe_Interface
       $tag = substr($glob, $pos, $pos2 - $pos);
       
       if ($tag && ($pos3 = strpos($tag, ':')) !== false) {
-        $type = strpos($tag, $pos3 + 1);
-        $tag = strpos($tag, 0, $pos3);
+        $type = substr($tag, $pos3 + 1);
+        $tag = substr($tag, 0, $pos3);
       } else {
         $type = 'int';
       }
-
+      $multiFlag = '+';
+      if ($type[0] == '?') {
+        $multiFlag = '*';
+        $type = substr($type, 1);
+      }
       switch($type) {
         case 'chinese':
-          $exp = '[x{4e00}-x{9fa5}]+';
+          $exp = '[x{4e00}-x{9fa5}]';
           $adorn = 'u';
           break;
         case 'int':
-          $exp = '[0-9]+';
+          $exp = '[0-9]';
           break;
         case 'hex':
-          $exp = '[0-9a-z]+';
+          $exp = '[0-9a-z]';
           break;
-        default:
-          $exp = '[0-9a-zA-Z\-\_\.]+';
+        case 'string':
+          $exp = '[0-9a-zA-Z\-\_\.]';
           break;
       }
-
-      $glob = substr($glob, 0, $pos - 2).'('. $exp.')'.substr($glob, $pos2 + 1);
+      $left = substr($glob, 0, $pos - 2);
+      if ($multiFlag == '*' && substr($left, -1) == '/') {
+        $left .= '?';
+      } 
+      $glob = $left.'('. $exp.$multiFlag.')'.substr($glob, $pos2 + 1);
       $args[$tag] = $type;
       $expEnabled = true;
 

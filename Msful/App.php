@@ -74,7 +74,7 @@ class Msful_App
 
   function onShutdown()
   {
-    if (!$this->code != Msful_Const::HTTP_CODE_OK) {
+    if ($this->code != Msful_Const::HTTP_CODE_OK) {
       $this->triggerError('msful.notfound');
     }
   }

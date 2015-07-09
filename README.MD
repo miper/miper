@@ -22,6 +22,18 @@ $app = Msful_App::getAppInstance();
 
 require_once '/app/user/UserExport.php';
 
+// 简单请求
+$app->request(array(
+    'get',
+    '/test/#{foo:?string}/#{userid}', 
+    function($req){
+      return array('args' => $req->args);
+    })
+  )
+  ->output()
+  ->end();
+
+
 $app
   // get请求，网址匹配/user/#{uid}时进行后续处理，如访问/user/40
   // 等于 ->pipe('request', ['get', '/user/#{uid}'])

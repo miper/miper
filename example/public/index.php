@@ -14,6 +14,18 @@ set_include_path(implode(PATH_SEPARATOR, array(
   );
 
 $app = Msful_App::getAppInstance();
+
+$app->request(array(
+    'get',
+    '/test/#{foo:?string}/#{userid}', 
+    function($req){
+      return array('args' => $req->args);
+    })
+  )
+  ->output()
+  ->end();
+
+
 $app->delegate('/user/', 'Happy_Delegate_User');
 
 $app->error('msful.notfound', function($msg, $detail) use($app) {
