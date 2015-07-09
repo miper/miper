@@ -2,11 +2,11 @@ Miper
 =========
 
 
-## Micro Service Restful Framework with Restful Style
+## `Mi`cro Service Pi`pe` Framework with `R`estful Style
 
-Restful风格、基于管道(Pipe)技术、使用PHP语言的微服务专有框架。
+`Restful`风格、基于管道(`Pipe`)技术、使用`PHP`语言的`微服务`专有框架。
 
-借鉴了Gulp以及linux里边的管道技术的思想，通过对数据流的控制和管理，给微服务的开发带来前所未有的快感和体验。
+借鉴了`Gulp`以及`linux`里边的管道技术的思想，通过对数据流的控制和管理，给微服务的开发带来前所未有的快感和体验。
 
 ## Miper的核心思想
 
@@ -42,7 +42,7 @@ $app->
 ```
 
 你可能觉得，pipe貌似不存在，其实上面的例子等价于
-```
+```php
 // 简单请求
 $app->
   pipe('request', array(
@@ -59,7 +59,7 @@ $app->
 下面来看一个稍微复杂的例子，这个接口调用另外一个类的函数返回数据并输出结果。
 
 
-```
+```php
 require_once '/app/user/UserExport.php';
 $app
   // get请求，网址匹配/user/#{uid}时进行后续处理，如访问/user/40
@@ -76,7 +76,7 @@ $app
   ;
 ```
 接下来是一个更加复杂的例子，它利用管道将第一个函数调用结果传给第二个接口，最终输出需要的数据。
-```
+```php
 $app
   // get请求，匹配/user/recommens网址
   ->get('/user/recommends')
@@ -131,5 +131,4 @@ server {
 * 接口数据拼装
 * 数据流式及简单逻辑处理
 * 自动化测试
-
-** markdown/jade/less支持
+* markdown/jade/less支持
