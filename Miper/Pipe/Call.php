@@ -6,7 +6,7 @@
  * @version   1.0.0
  */
 
-class Msful_Pipe_Call implements Msful_Pipe_Interface
+class Miper_Pipe_Call implements Miper_Pipe_Interface
 {
   private $classCache = array();
   /**

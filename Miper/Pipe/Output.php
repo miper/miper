@@ -6,12 +6,12 @@
  * @version $Id$
  */
 
-class Msful_Pipe_Output implements Msful_Pipe_Interface
+class Miper_Pipe_Output implements Miper_Pipe_Interface
 {
   
   function handle($app, $force)
   {
-    if (!$force && $app->code != Msful_Const::HTTP_CODE_OK) {
+    if (!$force && $app->code != Miper_Const::HTTP_CODE_OK) {
       return false;
     }
 
@@ -19,7 +19,7 @@ class Msful_Pipe_Output implements Msful_Pipe_Interface
     $options = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
     $ret = $app->datas;
     switch($format) {
-      case Msful_Const::FORMAT_JSON:
+      case Miper_Const::FORMAT_JSON:
         header('Content-type: application/json; charset=UTF-8');
         echo json_encode(array(
           'c' => $app->code,
@@ -27,7 +27,7 @@ class Msful_Pipe_Output implements Msful_Pipe_Interface
           't'  => floatval(sprintf('%.3f', (microtime(true) - $app->request->reqTime)*1000)),
         ), $options);
         break;
-      case Msful_Const::FORMAT_HTML:
+      case Miper_Const::FORMAT_HTML:
         header('Content-type: text/html; charset=UTF-8');
         if (is_scalar($ret)) {
           echo $ret;
@@ -37,7 +37,7 @@ class Msful_Pipe_Output implements Msful_Pipe_Interface
           echo '</pre>';
         }
         break;
-      case Msful_Const::FORMAT_TEXT:
+      case Miper_Const::FORMAT_TEXT:
         header('Content-type: text/plain; charset=UTF-8');
         if (is_scalar($ret)) {
           echo $ret;
@@ -45,7 +45,7 @@ class Msful_Pipe_Output implements Msful_Pipe_Interface
           print_r($ret);
         }
         break;
-      case Msful_Const::FORMAT_JAVASCRIPT:
+      case Miper_Const::FORMAT_JAVASCRIPT:
         header('Content-type: application/x-javascript; charset=UTF-8');
         if ( ($callback = $app->request->get('callback')) ) {
           echo sprintf('%s(%s);', $callback, json_encode(array(

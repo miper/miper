@@ -6,11 +6,11 @@
  * @version   1.0.0
  */
 
-interface Msful_Pipe_Interface
+interface Miper_Pipe_Interface
 {
   /**
    * 管道接口
-   * @param  Msful_App  $app      APP
+   * @param  Miper_App  $app      APP
    * @param  mixed      $options  选项
    * @return boolean 返回false，表示后续终端执行
    */

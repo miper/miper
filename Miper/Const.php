@@ -6,7 +6,7 @@
  * @version 1.0.0
  */
 
-class Msful_Const
+class Miper_Const
 {
   const METHOD_GET = 'get';
   const METHOD_POST = 'post';

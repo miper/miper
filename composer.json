@@ -1,12 +1,21 @@
 {
-    "name": "hapn/msful",
-    "description": "Micro Service Restful Framework",
-    "license": "MIT",
+    "name": "miper/miper",
+    "description": "Micro Service Pipe Framework with Restful Style",
+    "version": "0.3.0",
+    "license": "GPL",
+    "homepage": "https://github.com/miper/miper"
     "authors": [
         {
-            "name": "ronnie",
+            "name": "Ronnie Deng",
             "email": "comdeng@live.com"
         }
     ],
-    "require": {}
+    "minimum-stability": "beta",
+    "repositories" : [{
+        "type": "composer",
+        "url": "http://wpackagist.org"
+    },
+    "require": {
+        "php": ">=5.5.0",
+    }
 }

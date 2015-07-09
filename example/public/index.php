@@ -4,7 +4,7 @@ $root = dirname(__DIR__);
 define('VENDOR_DIR', $root.'/vendor/');
 define('LIBRARY_DIR', $root.'/src/');
 
-require VENDOR_DIR.'/Msful/App.php';
+require VENDOR_DIR.'/Miper/App.php';
 
 set_include_path(implode(PATH_SEPARATOR, array(
     get_include_path(),
@@ -13,15 +13,24 @@ set_include_path(implode(PATH_SEPARATOR, array(
   ))
   );
 
-$app = Msful_App::getAppInstance();
+$app = Miper_App::getAppInstance();
 
-$app->request(array(
-    'get',
+$app->get([
     '/test/#{foo:?string}/#{userid}', 
     function($req){
       return array('args' => $req->args);
-    })
+    }]
   )
+  ->output()
+  ->end();
+
+$app->
+  get([
+    '/hello/world', 
+    function($req){
+      return 'Hello,World';
+    }
+  ])
   ->output()
   ->end();
 

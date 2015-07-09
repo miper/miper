@@ -6,9 +6,9 @@
  * @version $Id$
  */
 
-class Happy_Delegate_User implements Msful_Delegate_Interface
+class Happy_Delegate_User implements Miper_Delegate_Interface
 {
-  function delegate(Msful_App $app)
+  function delegate(Miper_App $app)
   {
     require_once LIBRARY_DIR.'/app/user/UserExport.php';
 

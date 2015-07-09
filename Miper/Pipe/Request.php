@@ -7,7 +7,7 @@
  * @version $Id$
  */
 
-class Msful_Pipe_Request implements Msful_Pipe_Interface
+class Miper_Pipe_Request implements Miper_Pipe_Interface
 {
   function handle($app, $options)
   {
@@ -23,7 +23,7 @@ class Msful_Pipe_Request implements Msful_Pipe_Interface
         $method = trim($options, 0, $pos);
         $glob = trim($options, $pos + 1);
       } else {
-        $method = Msful_Const::METHOD_GET;
+        $method = Miper_Const::METHOD_GET;
         $glob = $options;
       }
     }
@@ -41,7 +41,7 @@ class Msful_Pipe_Request implements Msful_Pipe_Interface
       $app->request->args = $args;
     }
 
-    $app->code = Msful_Const::HTTP_CODE_OK;
+    $app->code = Miper_Const::HTTP_CODE_OK;
 
     if ($closure && is_callable($closure)) {
       $app->datas = call_user_func($closure, $app->request);

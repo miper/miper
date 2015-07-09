@@ -6,12 +6,12 @@
  * @version $Id$
  */
 
-interface Msful_Delegate_Interface
+interface Miper_Delegate_Interface
 {
   /**
    * 执行代理流程
-   * @param  Msful_App $app [description]
+   * @param  Miper_App $app [description]
    * @return [type]         [description]
    */
-  function delegate(Msful_App $app);
+  function delegate(Miper_App $app);
 }

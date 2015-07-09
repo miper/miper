@@ -6,12 +6,12 @@
  * @version   1.0.0
  */
 
-class Msful_App
+class Miper_App
 {
-  /** @var Msful_Request 请求 */
+  /** @var Miper_Request 请求 */
   var $request;
 
-  /** @var Msful_App app类 */
+  /** @var Miper_App app类 */
   private static $app;
 
   /** @var array 中转数据 */
@@ -34,7 +34,7 @@ class Msful_App
 
     spl_autoload_register(array($this, 'onAutoload'));
 
-    $this->request = new Msful_Request();
+    $this->request = new Miper_Request();
     $gets = $_GET;
     $posts = $_POST;
     $servers = array();
@@ -57,24 +57,24 @@ class Msful_App
     }
 
       
-    $this->code = Msful_Const::HTTP_CODE_NOT_FOUND;
+    $this->code = Miper_Const::HTTP_CODE_NOT_FOUND;
   }
 
   /**
    * 获取唯一实例
-   * @return Msful_App
+   * @return Miper_App
    */
   public static function getAppInstance()
   {
     if (!self::$app) {
-      self::$app = new Msful_App();
+      self::$app = new Miper_App();
     }
     return self::$app;
   }
 
   function onShutdown()
   {
-    if ($this->code != Msful_Const::HTTP_CODE_OK) {
+    if ($this->code != Miper_Const::HTTP_CODE_OK) {
       $this->triggerError('msful.notfound');
     }
   }
@@ -123,7 +123,7 @@ class Msful_App
    * 分配路由
    * @param  string $glob 路由的匹配规则
    * @param  string $className 用来处理的代理类
-   * @return Msful_App
+   * @return Miper_App
    */
   function delegate($glob, $className)
   {
@@ -140,15 +140,22 @@ class Msful_App
         throw new Exception('msful.notfound', 'delegete not found:'.$className);
       }
       $cls = new $className();
-      if ($cls instanceof Msful_Delegate_Interface) {
+      if ($cls instanceof Miper_Delegate_Interface) {
         $cls->delegate($this);
       }
     }
   }
 
   function __call($func, $args) {
-    if (in_array($func, Msful_Const::$methods)) {
-      return $this->pipe('request', array($func, $args[0]));
+    if (in_array($func, Miper_Const::$methods)) {
+      $firstArg = $args[0];
+      if (is_string($firstArg)) {
+        $firstArg = array($func, $firstArg);
+      } else if (is_array($firstArg)) {
+        array_unshift($firstArg, $func);
+      }
+      $args[0] = $firstArg;
+      $func = 'request';
     }
     array_unshift($args, $func);
     return call_user_func_array([$this, 'pipe'], $args);
@@ -181,7 +188,7 @@ class Msful_App
     }
 
     if (!isset($this->pipers[$executor])) {
-      $className = 'Msful_Pipe_'.ucfirst($executor);
+      $className = 'Miper_Pipe_'.ucfirst($executor);
       $cls = $this->pipers[$executor] = new $className();
     } else {
       $cls = $this->pipers[$executor];

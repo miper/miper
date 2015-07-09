@@ -8,7 +8,7 @@
 
 require_once __DIR__.'/Const.php';
 
-class Msful_Request
+class Miper_Request
 {
   private $gets = array();
   private $posts = array();
@@ -56,7 +56,7 @@ class Msful_Request
    * @param  array $gets    get请求变量
    * @param  array $posts   post请求变量
    * @param  array $servers server变量
-   * @return Msful_Request
+   * @return Miper_Request
    */
   function init($gets, $posts, $servers)
   {
@@ -71,11 +71,11 @@ class Msful_Request
     // 根据网址后缀来决定使用哪种格式返回
     $url = $uriInfo['path'];
     $pathInfo = pathinfo($url);
-    $ext = Msful_Const::FORMAT_JSON;
+    $ext = Miper_Const::FORMAT_JSON;
     if (isset($pathInfo['extension'])) {
       $ext = strtolower($pathInfo['extension']);
-      if (!in_array($ext, Msful_Const::$formats)) {
-        $ext = Msful_Const::FORMAT_JSON;
+      if (!in_array($ext, Miper_Const::$formats)) {
+        $ext = Miper_Const::FORMAT_JSON;
       }
     }
     $this->format = $ext;
@@ -91,7 +91,7 @@ class Msful_Request
       } else if (isset($servers['X_HTTP_METHOD_OVERRIDE'])) {
         $_method = strtolower($servers['X_HTTP_METHOD_OVERRIDE']);
       }
-      if ($_method && $_method != $method && in_array($method, Msful_Const::$methods)) {
+      if ($_method && $_method != $method && in_array($method, Miper_Const::$methods)) {
         $method = $_method;
       }
     }
@@ -129,7 +129,7 @@ class Msful_Request
    */
   function post($key, $defVal = null)
   {
-    return $this->_getPostVal(Msful_Const::METHOD_POST, $key, $defVal);
+    return $this->_getPostVal(Miper_Const::METHOD_POST, $key, $defVal);
   }
 
   /**
@@ -140,7 +140,7 @@ class Msful_Request
    */
   function put($key, $defVal = null)
   {
-    return $this->_getPostVal(Msful_Const::METHOD_PUT, $key, $defVal);
+    return $this->_getPostVal(Miper_Const::METHOD_PUT, $key, $defVal);
   }
 
   /**
@@ -151,7 +151,7 @@ class Msful_Request
    */
   function delete($key, $defVal = null)
   {
-    return $this->_getPostVal(Msful_Const::METHOD_DELETE, $key, $defVal);
+    return $this->_getPostVal(Miper_Const::METHOD_DELETE, $key, $defVal);
   }
 
   function _getPostVal($method, $key, $defVal = null)
