@@ -50,6 +50,9 @@ $app->
   ->end();
 ```
 
+下面来看一个稍微复杂的例子，这个接口调用另外一个类的函数返回数据并输出结果。
+
+
 ```
 require_once '/app/user/UserExport.php';
 $app
@@ -65,8 +68,9 @@ $app
   // 结束该流程
   ->end()
   ;
-
-  
+```
+接下来是一个更加复杂的例子，它利用管道将第一个函数调用结果传给第二个接口，最终输出需要的数据。
+```
 $app
   // get请求，匹配/user/recommens网址
   ->get('/user/recommends')
