@@ -1,37 +1,37 @@
 <?php
 
-$root = dirname(dirname(__DIR__));
+$root = dirname(__DIR__);
+define('VENDOR_DIR', $root.'/vendor/');
+define('LIBRARY_DIR', $root.'/src/');
 
-require $root.'/src/Msful/App.php';
+require VENDOR_DIR.'/Msful/App.php';
 
-define('ROUTER_ROOT', dirname(__DIR__).'/service/');
+set_include_path(implode(PATH_SEPARATOR, array(
+    get_include_path(),
+    VENDOR_DIR,
+    LIBRARY_DIR,
+  ))
+  );
 
-$app = new Msful_App();
+$app = Msful_App::getAppInstance();
 
-function test($fooId)
-{
-  return 'hello:'.$fooId;
-}
+$app->request(array(
+    'get',
+    '/test/#{foo:?string}/#{userid}', 
+    function($req){
+      return array('args' => $req->args);
+    })
+  )
+  ->output()
+  ->end();
 
-$app->get('/test/#{fooId}', 'test');
-$app->delegate('/docs/', $root.'/src/Msful_Docs/Service.php', 'Msful_Docs_Service', array(
-  'glob' => ROUTER_ROOT.'**/*Export.php',
-  ));
 
-// $app->get('/test', function() {
-//   return 'test';
-// });
-// $app->delegate('/demo/', ROUTER_ROOT.'/demo/index.php');
-// $app->delegate('/user/', ROUTER_ROOT.'/user/index.php');
-// $app->delegate('/user/test/', ROUTER_ROOT.'/user/index.php');
-$app->get('/hello', function() {
-  return 'hello';
-});
-$app->delegate('/user/', ROUTER_ROOT.'user/routers.php');
+$app->delegate('/user/', 'Happy_Delegate_User');
 
-$app->error('msful.notfound', function() {
+$app->error('msful.notfound', function($msg, $detail) use($app) {
+  header('HTTP/1.1 404 Not Found');
   return array(
-    'code' => 404,
-    'data'  => 'notfound',
+    'msg'     => $msg,
+    'detail'  => $detail,
   );
 });

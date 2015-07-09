@@ -2,6 +2,9 @@
 
 /**
  * 用户类
+ * test
+ * @author  ronnie<dengxiaolong@hunbasha.com>
+ * @since  2015/7/8 16:49:23
  * @param string $avatar 头像地址
  * @param enum[int] $status 状态 vars(-1:删除, -2:禁用, 1:正常)
  * @param string $uname 用户名
@@ -30,7 +33,45 @@ class UserExport
       'uid' => $uid,
       'uname' => 'ronnie',
       'sex' => 1,
+      'flag' => 3,
     );
+  }
+
+  /**
+   * 获取指定的城市的推荐用户
+   * @param  int $cityId 城市ID
+   * @param  [int=20] $num 数量
+   * @return array
+   * -array
+   *  -int $uid 用户id
+   */
+  function getRecommendUserIds($cityId, $num = 20)
+  {
+    return array(
+      rand(30, 44),
+      rand(334,343),
+      rand(223, 243),
+      rand(1932, 2234),
+      );
+  }
+
+  /**
+   * 批量获取用户
+   * @param  [type]
+   * @return [type]
+   */
+  function batchGetUsers($userIds)
+  {
+    $ret = array();
+    foreach($userIds as $uid) {
+      $ret[] = array(
+        'uid' => $uid,
+        'uname' => 'uname'.rand(10000, 99999),
+        'sex' => rand(1, 2),
+        'flag' => rand(1,4),
+      );
+    }
+    return $ret;
   }
 
   /**

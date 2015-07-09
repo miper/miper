@@ -1,9 +1,9 @@
 <?php
 /**
- * http请求
- * @author ronnie<comdeng@live.com>
- * @since    2015-07-07 16:29:48
- * @version 1.0.0
+ * 请求类
+ * @author    ronnie<comdeng@live.com>
+ * @since     2015-07-08 19:36:12
+ * @version   1.0.0
  */
 
 require_once __DIR__.'/Const.php';
@@ -15,9 +15,41 @@ class Msful_Request
   private $servers = array();
 
 
+  /**
+   * 访问方法
+   * @var [type]
+   */
   var $method;
+  /**
+   * 访问网址
+   * @var string
+   */
   var $url;
+  /**
+   * 输出状态
+   * @var string
+   */
   var $format = 'json';
+  /**
+   * 是否处于调试状态
+   * @var boolean
+   */
+  var $debug = false;
+  /**
+   * 请求终端
+   * @var string
+   */
+  var $terminal;
+  /**
+   * 请求时间
+   * @var float
+   */
+  var $reqTime;
+  /**
+   * 通过网址传递过来的参数
+   * @var array
+   */
+  var $args = array();
 
   /**
    * 初始化请求
@@ -28,6 +60,7 @@ class Msful_Request
    */
   function init($gets, $posts, $servers)
   {
+    $this->reqTime = isset($servers['REQUEST_TIME_FLOAT']) ? $servers['REQUEST_TIME_FLOAT'] : microtime(true);
     // 获取请求网址
     $uri = $servers['REQUEST_URI'];
     $uriInfo = parse_url($uri);
