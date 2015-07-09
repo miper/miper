@@ -19,10 +19,14 @@ class Miper_App
 
   var $code;
 
+  var $pipeId = 0;
+
   private $start;
 
   private $pipeContinue = true;
   private $hitDelegate = false;
+
+  private static $hooks = array();
 
   private $pipers = array();
 
@@ -40,7 +44,7 @@ class Miper_App
     $servers = array();
 
     foreach($_SERVER as $key => $value) {
-      if (preg_match('#^(SERVER|HTTP|REQUEST|REMOTE)\_#', $key)) {
+      if (preg_match('#^(SERVER|HTTP|REQUEST|REMOTE|X_)\_#', $key)) {
         $servers[$key] = $value;
       }
     }
@@ -55,7 +59,6 @@ class Miper_App
     if ($this->request->debug) {
       ini_set('display.errors', true);
     }
-
       
     $this->code = Miper_Const::HTTP_CODE_NOT_FOUND;
   }
@@ -119,6 +122,11 @@ class Miper_App
     $this->errors[$code] = $callback;
   }
 
+  static function hook($hookName, $closure)
+  {
+    self::$hooks[$hookName][] = $closure;
+  }
+
   /**
    * 分配路由
    * @param  string $glob 路由的匹配规则
@@ -171,6 +179,18 @@ class Miper_App
    */
   function pipe($executor, $options = null, $wrapper = null, $causes = null)
   {
+    // 在执行pipe之前检查是否有对应的钩子（hook）
+    $hookName = sprintf('pipe.%s.before', $executor);
+    if (!empty(self::$hooks[$hookName])) {
+      $hooks = self::$hooks[$hookName];
+      $_args = func_get_args();
+      foreach($hooks as $hook) {
+        if ( ($ret = call_user_func($hook, $this, $executor, $options)) === false ) {
+          return $this;
+        }
+      }
+    }
+
     if (!$this->pipeContinue) {
       return $this;
     }
@@ -218,5 +238,6 @@ class Miper_App
   function end()
   {
       $this->pipeContinue = true;
+      $this->pipeId++;
   }
 }

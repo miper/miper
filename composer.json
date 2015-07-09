@@ -1,9 +1,17 @@
 {
     "name": "miper/miper",
     "description": "Micro Service Pipe Framework with Restful Style",
+    "keywords":[
+        "php",
+        "micro service",
+        "pipe",
+        "gulp",
+        "restful",
+        "framework"
+    ],
     "version": "0.3.0",
     "license": "GPL",
-    "homepage": "https://github.com/miper/miper"
+    "homepage": "https://github.com/miper/miper",
     "authors": [
         {
             "name": "Ronnie Deng",
@@ -11,11 +19,14 @@
         }
     ],
     "minimum-stability": "beta",
-    "repositories" : [{
-        "type": "composer",
-        "url": "http://wpackagist.org"
-    },
+    "repositories" : [
+        {"type": "composer", "url": "http://pkg.phpcomposer.com/repo/packagist/"},
+        {"packagist": false}
+    ],
     "require": {
-        "php": ">=5.5.0",
+        "php": ">=5.5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.7"
     }
 }

@@ -20,6 +20,12 @@ Restful风格、基于管道(Pipe)技术、使用PHP语言的微服务专有框�
 使用`Miper`很容易上手，下面的例子构建了一个简单的接口。
 
 ```php
+define('VENDOR_DIR', $root.'/vendor/');
+define('LIBRARY_DIR', $root.'/src/');
+
+require VENDOR_DIR.'/Miper/Autoload.php';
+Miper_Autoload::autoload(VENDOR_DIR, LIBRARY_DIR);
+
 $app = Miper_App::getAppInstance();
 
 // 简单请求

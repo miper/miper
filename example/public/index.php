@@ -4,14 +4,8 @@ $root = dirname(__DIR__);
 define('VENDOR_DIR', $root.'/vendor/');
 define('LIBRARY_DIR', $root.'/src/');
 
-require VENDOR_DIR.'/Miper/App.php';
-
-set_include_path(implode(PATH_SEPARATOR, array(
-    get_include_path(),
-    VENDOR_DIR,
-    LIBRARY_DIR,
-  ))
-  );
+require VENDOR_DIR.'/Miper/Autoload.php';
+Miper_Autoload::autoload(VENDOR_DIR, LIBRARY_DIR);
 
 $app = Miper_App::getAppInstance();
 
