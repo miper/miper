@@ -10,7 +10,6 @@ class Miper_View_Simple
 {
   function fetch($path, $vars = array())
   {
-    var_dump(func_get_args());die();
     $delPath = false;
     if (is_string($path) && !is_file($path)) {
       $delPath = true;
